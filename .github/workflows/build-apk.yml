@@ -35,9 +35,13 @@ jobs:
 
       - name: Encontrar proyecto Android
         run: |
-          PROJECT_DIR=$(dirname "$(find proyecto -name settings.gradle -o -name settings.gradle.kts | head -n 1)")
+          PROJECT_DIR=$(dirname "$(find proyecto \( -name settings.gradle -o -name settings.gradle.kts \) | head -n 1)")
           echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
           test -n "$PROJECT_DIR"
+
+      - name: Corregir compatibilidad Java 17
+        run: |
+          find "$PROJECT_DIR" -type f \( -name '*.gradle' -o -name '*.gradle.kts' \) -exec sed -i 's/1\.8/17/g; s/VERSION_1_8/VERSION_17/g' {} +
 
       - name: Compilar aplicación
         run: gradle -p "$PROJECT_DIR" assembleDebug --no-daemon
